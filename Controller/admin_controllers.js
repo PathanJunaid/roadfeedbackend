@@ -26,6 +26,7 @@ export const AdminAuthenticated = async (req, res, next) => {
 }
 export const AdminLogin = async (req, res) => {
     const { Email, Password } = req.body;
+
     const isAdmin = await Admin_Connect.findOne({ Email: Email }).then().catch((e) => {
         res.send("Try Again");
         return;
@@ -33,24 +34,28 @@ export const AdminLogin = async (req, res) => {
     // console.log(isAdmin);
     if (!isAdmin) {
         res.send({
-            IsLogged: false,
-            massage: "Email not Registered"
+            status: "Email not Registered",
+            code: "220",
+            data: []
+
         });
         return;
     }
     const Comparepass = bcrypt.compareSync(Password, isAdmin.Password);
     if (!Comparepass) {
         res.send({
-            IsLogged: false,
-            massage: "Wrong Password"
+            status: "Wrong Password",
+            code: "220",
+            data: []
         });
         return;
     }
     const jwtToken = jwt.sign({ id: isAdmin._id }, process.env.jwtsecrettoken);
     res.cookie(process.env.AdminCookie, jwtToken, { maxAge: 6000000, httpOnly: false });
     res.send({
-        IsLogged: true,
-        massage: "Admin Logged in"
+        status: "Logged in Successfully!",
+        code: "200",
+        data: []
     });
 }
 export const AdminLogout = async (req, res) => {
@@ -68,22 +73,123 @@ export const AdminLogout = async (req, res) => {
     }
 }
 export const AdminRegister = async (req, res) => {
-    const { Email, Password,Name } = req.body;
-    console.log(req.body);
-    const isAdmin = await Admin_Connect.findOne({ Admin: true }).then().catch((e) => {
-        res.send("Try Again");
+    const { Email, Password, Name } = req.body;
+    const isAdmin = await Admin_Connect.findOne({ Email: Email }).then().catch((e) => {
+
         return;
     });
     if (isAdmin) {
-        res.send("Admin Exist");
+        res.send({
+            status: "Email Already in Use",
+            code: "220",
+            data: []
+        });
         return;
     }
     const HashedPassword = await bcrypt.hash(Password, 8)
     // console.log(HashedPassword)
     const Admin = await Admin_Connect.create({
-        Email, Password: HashedPassword, Admin: true,Name
+        Email, Password: HashedPassword, Admin: true, Name
     });
     if (Admin) {
-        res.send("Admin Created");
+        res.send({
+            status: "User Created",
+            code: "210",
+            data: [Admin]
+        });
     }
+}
+export const CheckAuth = async (req, res) => {
+    try {
+        const Cookie_Value = req.cookies[process.env.AdminCookie];
+        const id = jwt.verify(Cookie_Value, process.env.jwtsecrettoken, (err, res) => {
+            if (err) {
+
+            } else {
+                return res.id;
+            }
+        });
+        const Admin_Details = await Admin_Connect.findById(id).then().catch((e) => {
+            console.log("Admin Error");
+        });
+        console.log(id)
+        if (!Admin_Details) {
+            res.send({
+                status: "Not Logged In",
+                code: "220",
+                data: []
+            });
+            return;
+        } else {
+        }
+        res.send({
+            status: "Logged In",
+            code: "200",
+            data: []
+        });
+        // next();
+
+    } catch (e) {
+        res.send({
+            status: "Not",
+            code: "220",
+            data: []
+        })
+    }
+
+}
+export const EditFormfeed = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { msg } = req.body;
+        console.log(msg)
+        const resp = await form_data_connect.findByIdAndUpdate(id, { $set: { Status: msg } });
+        console.log(resp)
+        if (resp) {
+            res.send(
+                {
+                    status: "Status Updated!",
+                    code: "200",
+                    data: []
+                }
+            )
+        } else {
+            res.send(
+                {
+                    status: "Failed!",
+                    code: "220",
+                    data: []
+                }
+            )
+
+        }
+
+    } catch (e) {
+        res.send(
+            {
+                status: "Failed!",
+                code: "220",
+                data: []
+            }
+        )
+    }
+
+}
+export const DeleteAdmin = async (req, res) => {
+    const {id} = req.body
+    var Response = {
+        status: "Deleted User",
+        code: 200,
+        data: []
+    }
+    const data = await Admin_Connect.findByIdAndDelete(id).then((res) => {
+        
+    }).catch((e) => {
+        Response = {
+            status: "failed!",
+            code: 404,
+            data: []
+        }
+    })
+    res.send(Response)
 }

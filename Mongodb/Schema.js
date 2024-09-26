@@ -16,6 +16,14 @@ const Form_Schema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    Category: {
+        type: String,
+        required: true,
+    },
+    Severity: {
+        type : String,
+        required :true
+    },
     State: {
         type: String,
         required: true,
@@ -34,28 +42,32 @@ const Form_Schema = new mongoose.Schema({
     },
     Description: {
         type: String,
+    },
+    Status: {
+        type: String,
+        required:true
     }
 })
 
-export const form_data_connect = mongoose.model("Formdata",Form_Schema);
+export const form_data_connect = mongoose.model("Formdata", Form_Schema);
 
 const Admin_Schema = new mongoose.Schema({
-    Email : {
-        type : String,
-        required:true,
+    Email: {
+        type: String,
+        required: true,
     },
-    Password : {
-        type : String,
-        required:true,
+    Password: {
+        type: String,
+        required: true,
     },
-    Admin : {
-        type : String,
-        required : true,
+    Admin: {
+        type: String,
+        required: true,
     },
-    Name : {
-        type:String,
-        required : true,
+    Name: {
+        type: String,
+        required: true,
     },
 })
 
-export const Admin_Connect = mongoose.model('User_Details',Admin_Schema);
+export const Admin_Connect = mongoose.model('User_Details', Admin_Schema);

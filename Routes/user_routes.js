@@ -6,10 +6,11 @@ import { feedbackformsearch } from '../Controller/User_Controllers.js';
 export const User_routes = express.Router();
 
 User_routes.post('/formsubmit', upload.single('Image'), async (req, res) => {
-    const { Name, Email, Number, City, State, Latitude, Longitude, Description } = req.body;
+    const { Name, Email, Number, City, State, Latitude, Longitude, Description,Category,Severity } = req.body;
+    console.log(req.body)
     const Image = req.file.filename;
     const data = await form_data_connect.create({
-        Name, Email, Number, City, State, Latitude, Longitude, Image, Description
+        Name, Email, Number, City, State, Latitude, Longitude, Image, Description,Category,Severity,Status:"Pending"
     })
     if (data) {
         res.send({

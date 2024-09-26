@@ -6,6 +6,12 @@ import cors from 'cors';
 import {User_routes} from "./Routes/user_routes.js";
 import { admin_routes } from "./Routes/Admin_Routes.js";
 import multer from "multer";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the current directory name
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
 const corsOptions = {
@@ -14,6 +20,7 @@ const corsOptions = {
   credentials: true,
 };
 // MiddleWare 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
@@ -37,6 +44,6 @@ app.get('/',(req,res)=>{
     res.send("Hello World")
 })
 
-app.listen(3000,()=> {
-    console.log(`Server running on 3000`);
+app.listen(4000,()=> {
+    console.log(`Server running on 4000`);
 })
